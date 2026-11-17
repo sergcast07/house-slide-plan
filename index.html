@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>House & Slide Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: one narrow column. Two deadline meters on top, then the days in order, today first and open. */
+:root{
+  --bg:#f3f6f4; --card:#ffffff; --fg:#17211c; --muted:#5d6b64; --line:#d6dfda;
+  --accent:#1f6b4a; --accent-soft:#e0efe7; --flag:#b45309; --flag-soft:#fdf0dc; --done:#8a978f;
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111815; --card:#1a2420; --fg:#e8efeb; --muted:#9aaaa1; --line:#2c3a34;
+  --accent:#5cc494; --accent-soft:#1d3329; --flag:#f0a34a; --flag-soft:#3a2a14; --done:#6f7d76; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#111815; --card:#1a2420; --fg:#e8efeb; --muted:#9aaaa1; --line:#2c3a34;
+  --accent:#5cc494; --accent-soft:#1d3329; --flag:#f0a34a; --flag-soft:#3a2a14; --done:#6f7d76; color-scheme:dark }
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:680px;margin:0 auto;padding-block:24px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--display);font-size:1.75rem;line-height:1.15;margin:0;text-wrap:balance}
+.lead{margin:6px 0 0;color:var(--muted)}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.meter{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.meter .when{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--flag);font-weight:600}
+.meter .what{font-family:var(--display);font-size:1.05rem;margin-top:2px}
+.meter .nums{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.status{font-size:.85rem;color:var(--muted);background:var(--flag-soft);border-radius:8px;padding:8px 12px}
+.rule{font-size:.9rem;color:var(--muted);margin:0}
+.rule b{color:var(--fg);font-weight:600}
+#days,#earlierBody{display:flex;flex-direction:column;gap:14px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.day.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.day.off{background:transparent;border-style:dashed}
+.dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.dhead h2{font-family:var(--display);font-size:1.1rem;margin:0}
+.badge{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
+.badge.now{background:var(--accent);color:var(--card)}
+.badge.dl{background:var(--flag-soft);color:var(--flag)}
+.count{margin-left:auto;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.note{font-size:.9rem;color:var(--muted);margin:2px 0 0}
+ul.tasks{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column}
+ul.tasks:empty{margin:0}
+li.task{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+li.task label{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:pointer}
+li.task input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--accent);cursor:pointer}
+li.task span{overflow-wrap:anywhere}
+li.task.done span{color:var(--done);text-decoration:line-through}
+.x{flex:none;border:0;background:none;color:var(--muted);font:inherit;font-size:.8rem;padding:2px 6px;border-radius:6px;cursor:pointer}
+.x:hover,.x.sure{color:var(--flag);background:var(--flag-soft)}
+form.add{display:flex;gap:8px;margin-top:10px}
+form.add input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+form.add button{font:inherit;font-weight:600;padding:8px 14px;border:0;border-radius:8px;background:var(--accent);color:var(--card);cursor:pointer}
+form.add button:disabled{opacity:.5}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.earlier>summary{cursor:pointer;color:var(--muted);font-size:.9rem;padding:4px 0}
+details.earlier[open]>summary{margin-bottom:10px}
+.readonly form.add,.readonly .x{display:none}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap" id="app">
+  <header>
+    <h1>House &amp; Slide Plan</h1>
+    <p class="lead">Nov 16 to Dec 6. Check things off as you go, and add anything that's missing under the day it belongs to. Checkmarks and added items are saved on this device only. Finished early? Pull something from tomorrow.</p>
+  </header>
+
+  <div class="meters">
+    <div class="meter"><div class="when" id="m1when">Sat Nov 21, noon</div><div class="what">House ready for guests</div>
+      <div class="nums"><span id="m1left"></span><span id="m1num"></span></div><div class="bar"><i id="m1bar"></i></div></div>
+    <div class="meter"><div class="when" id="m2when">Sun Dec 6, 5 p.m.</div><div class="what">Slide done, group over</div>
+      <div class="nums"><span id="m2left"></span><span id="m2num"></span></div><div class="bar"><i id="m2bar"></i></div></div>
+  </div>
+
+  <div class="status" id="status" role="status" hidden></div>
+  <p class="rule"><b>Every room, as you clean it:</b> wipe baseboards and walls, and do the windows.</p>
+
+  <details class="earlier" id="earlier" hidden><summary id="earlierSum">Earlier days</summary><div id="earlierBody"></div></details>
+  <div id="days"></div>
+</div>
+
+<script>
+const DAYS=[
+ {d:"2026-11-16",t:"Monday, Nov 16",n:"About 1 hour, upstairs"},
+ {d:"2026-11-17",t:"Tuesday, Nov 17",n:"The big push, about 3 hours"},
+ {d:"2026-11-18",t:"Wednesday, Nov 18",n:"After 8 p.m. Light indoor jobs only"},
+ {d:"2026-11-19",t:"Thursday, Nov 19",n:"Trailer goes to work, wood comes home. About 3 hours"},
+ {d:"2026-11-20",t:"Friday, Nov 20",n:"Dinner with friends. Nothing big tonight"},
+ {d:"2026-11-21",t:"Saturday, Nov 21",n:"Morning only",dl:"Guests at noon"},
+ {d:"2026-11-22",t:"Sunday, Nov 22",n:"Slide day: layout, posts, burn"},
+ {d:"2026-11-23",t:"Monday, Nov 23",n:"Evening"},
+ {d:"2026-11-24",t:"Tuesday, Nov 24",n:"Evening"},
+ {d:"2026-11-25",e:"2026-11-28",t:"Wed Nov 25 to Sat Nov 28",n:"No work days. The concrete cures.",off:true},
+ {d:"2026-11-29",t:"Sunday, Nov 29",n:"Full day"},
+ {d:"2026-11-30",t:"Monday, Nov 30",n:"Practice night. Nothing planned"},
+ {d:"2026-12-01",t:"Tuesday, Dec 1",n:"Evening"},
+ {d:"2026-12-02",t:"Wednesday, Dec 2",n:"After 8 p.m."},
+ {d:"2026-12-03",t:"Thursday, Dec 3",n:"Evening"},
+ {d:"2026-12-04",t:"Friday, Dec 4",n:"Open. Catch up on anything behind"},
+ {d:"2026-12-05",t:"Saturday, Dec 5",n:"Dump run, then finish the slide"},
+ {d:"2026-12-06",t:"Sunday, Dec 6",n:"Set up and enjoy it",dl:"Group at 5 p.m."}
+];
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const now=new Date(), today=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+let db=null, tasks=[], canWrite=true, loaded=false;
+const lists={}, counts={};
+
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function isToday(D){return D.e?(today>=D.d&&today<=D.e):D.d===today}
+function isPast(D){return (D.e||D.d)<today}
+
+function build(){
+  DAYS.forEach((D,i)=>{
+    const sec=el("section","day"+(isToday(D)?" today":"")+(D.off?" off":""));
+    const h=el("div","dhead");h.append(el("h2",null,D.t));
+    if(isToday(D))h.append(el("span","badge now","Today"));
+    if(D.dl)h.append(el("span","badge dl",D.dl));
+    const c=el("span","count");h.append(c);counts[D.d]=c;
+    sec.append(h,el("p","note",D.n));
+    const ul=el("ul","tasks");lists[D.d]=ul;sec.append(ul);
+    if(!D.off){
+      const f=el("form","add");const inp=el("input");inp.id="add-"+D.d;inp.placeholder="Add something for this day";
+      inp.maxLength=140;inp.setAttribute("aria-label","Add a task for "+D.t);
+      const b=el("button",null,"Add");b.type="submit";f.append(inp,b);
+      f.addEventListener("submit",async ev=>{ev.preventDefault();const text=inp.value.trim();if(!text)return;
+        b.disabled=true;
+        try{addTask(D.d,text);inp.value=""}
+        catch(e){writeFailed(e)}
+        b.disabled=false});
+      sec.append(f);
+    }
+    (isPast(D)?$("earlierBody"):$("days")).append(sec);
+  });
+  $("earlier").hidden=!$("earlierBody").children.length;
+}
+
+function draw(){
+  const by={};tasks.forEach(t=>{(by[t.day]=by[t.day]||[]).push(t)});
+  let pastLeft=0;
+  DAYS.forEach(D=>{
+    const ul=lists[D.d], arr=(by[D.d]||[]).sort((a,b)=>(a.order||0)-(b.order||0));
+    ul.textContent="";
+    arr.forEach(t=>{
+      const li=el("li","task"+(t.done?" done":""));
+      const lab=el("label");const cb=el("input");cb.type="checkbox";cb.checked=!!t.done;cb.id="t-"+t.id;cb.disabled=!canWrite;
+      cb.addEventListener("change",async()=>{cb.disabled=true;
+        try{setDone(t.id,cb.checked)}catch(e){cb.checked=!cb.checked;writeFailed(e)}
+        cb.disabled=!canWrite});
+      lab.append(cb,el("span",null,String(t.text||"")));
+      const x=el("button","x","×");x.type="button";x.setAttribute("aria-label","Remove this task");
+      x.addEventListener("click",async()=>{
+        if(!x.classList.contains("sure")){x.classList.add("sure");x.textContent="Remove?";setTimeout(()=>{x.classList.remove("sure");x.textContent="×"},3000);return}
+        try{removeTask(t.id)}catch(e){writeFailed(e)}});
+      li.append(lab,x);ul.append(li);
+    });
+    const left=arr.filter(t=>!t.done).length;
+    counts[D.d].textContent=arr.length?(left?left+" left":"All done"):"";
+    if(isPast(D))pastLeft+=left;
+  });
+  $("earlierSum").textContent="Earlier days"+(pastLeft?" ("+pastLeft+" still open)":" (all done)");
+  meter("m1",tasks.filter(t=>t.day<="2026-11-21"),"2026-11-21");
+  meter("m2",tasks,"2026-12-06");
+}
+function meter(id,arr,date){
+  const done=arr.filter(t=>t.done).length;
+  $(id+"num").textContent=loaded?done+" of "+arr.length+" done":"";
+  $(id+"bar").style.width=arr.length?(100*done/arr.length)+"%":"0";
+  const days=Math.round((new Date(date+"T00:00")-new Date(today+"T00:00"))/864e5);
+  $(id+"left").textContent=days>1?days+" days to go":days===1?"Tomorrow":days===0?"Today":"Passed";
+}
+function setStatus(msg){const s=$("status");s.hidden=!msg;s.textContent=msg||""}
+function writeFailed(e){
+  if(e&&e.code==="invalid_argument"){canWrite=false;$("app").classList.add("readonly");setStatus("You can see the list but can't change it yet. Ask Sergio to share it with you as a contributor.");draw()}
+  else setStatus("That didn't save. Check your connection and try again.");
+}
+
+const SEED=[{"id": "1116-1", "day": "2026-11-16", "text": "Guest room upstairs: strip and remake the bed, clear surfaces", "order": 10}, {"id": "1116-2", "day": "2026-11-16", "text": "Lincoln's room: clear the floor, bed and dresser ready for guests", "order": 20}, {"id": "1116-3", "day": "2026-11-16", "text": "Put away clothes (first pass)", "order": 30}, {"id": "1116-4", "day": "2026-11-16", "text": "Kids: start on your own rooms, done by Thursday", "order": 40}, {"id": "1117-1", "day": "2026-11-17", "text": "Dishes: the big catch-up", "order": 10}, {"id": "1117-2", "day": "2026-11-17", "text": "Boys' bathroom deep clean (guests will use it)", "order": 20}, {"id": "1117-3", "day": "2026-11-17", "text": "Kitchen", "order": 30}, {"id": "1117-4", "day": "2026-11-17", "text": "Dining room", "order": 40}, {"id": "1117-5", "day": "2026-11-17", "text": "Office", "order": 50}, {"id": "1118-1", "day": "2026-11-18", "text": "School room and school room closet", "order": 10}, {"id": "1118-2", "day": "2026-11-18", "text": "Music room", "order": 20}, {"id": "1118-3", "day": "2026-11-18", "text": "Laundry room", "order": 30}, {"id": "1118-4", "day": "2026-11-18", "text": "Put away clothes (finish)", "order": 40}, {"id": "1118-5", "day": "2026-11-18", "text": "Dishes", "order": 50}, {"id": "1118-6", "day": "2026-11-18", "text": "Order the slide wood for pickup Thursday", "order": 60}, {"id": "1118-7", "day": "2026-11-18", "text": "Decide the menu for Saturday lunch, Saturday dinner and Sunday breakfast, and write the shopping list", "order": 70}, {"id": "1119-1", "day": "2026-11-19", "text": "Take the trailer to work, pick up the slide wood on the way home", "order": 10}, {"id": "1119-2", "day": "2026-11-19", "text": "Unload the wood", "order": 20}, {"id": "1119-3", "day": "2026-11-19", "text": "Weed-eat the yard (while it's light)", "order": 30}, {"id": "1119-4", "day": "2026-11-19", "text": "Garage pickup", "order": 40}, {"id": "1119-5", "day": "2026-11-19", "text": "Clean out the refrigerator", "order": 50}, {"id": "1119-6", "day": "2026-11-19", "text": "Kids' rooms checked", "order": 60}, {"id": "1119-7", "day": "2026-11-19", "text": "Dishes", "order": 70}, {"id": "1119-8", "day": "2026-11-19", "text": "Grocery shopping: Saturday lunch, Saturday dinner, Sunday breakfast", "order": 54}, {"id": "1119-9", "day": "2026-11-19", "text": "Food prep: make ahead whatever can be made ahead", "order": 56}, {"id": "1120-1", "day": "2026-11-20", "text": "10-minute walkthrough, then dinner", "order": 10}, {"id": "1121-1", "day": "2026-11-21", "text": "Floors", "order": 10}, {"id": "1121-2", "day": "2026-11-21", "text": "Trash out", "order": 20}, {"id": "1121-3", "day": "2026-11-21", "text": "Final bathroom wipe", "order": 30}, {"id": "1121-4", "day": "2026-11-21", "text": "Dishes", "order": 40}, {"id": "1121-5", "day": "2026-11-21", "text": "Get lunch ready for guests", "order": 50}, {"id": "1121-6", "day": "2026-11-21", "text": "Dinner for guests", "order": 60}, {"id": "1122-0", "day": "2026-11-22", "text": "Breakfast for guests", "order": 5}, {"id": "1122-1", "day": "2026-11-22", "text": "Lay out and frame the slide on the hill", "order": 10}, {"id": "1122-2", "day": "2026-11-22", "text": "Dig and set posts in concrete where the joints land", "order": 20}, {"id": "1122-3", "day": "2026-11-22", "text": "Burn the scrap pile plus post and framing offcuts", "order": 30}, {"id": "1123-1", "day": "2026-11-23", "text": "Finish any posts not set Sunday", "order": 10}, {"id": "1123-2", "day": "2026-11-23", "text": "Fix the garden door (if time)", "order": 20}, {"id": "1124-2", "day": "2026-11-24", "text": "Any slide loose ends", "order": 20}, {"id": "1129-1", "day": "2026-11-29", "text": "Frame the slide onto the posts", "order": 10}, {"id": "1129-2", "day": "2026-11-29", "text": "Fix the pavers (about 45 minutes)", "order": 20}, {"id": "1129-3", "day": "2026-11-29", "text": "Basement: first 2 hours", "order": 30}, {"id": "1201-1", "day": "2026-12-01", "text": "Basement: second 2 hours", "order": 10}, {"id": "1201-2", "day": "2026-12-01", "text": "Load the trailer: garbage, old Christmas tree, old Big Green Egg, back deck furniture, basement junk", "order": 20}, {"id": "1202-1", "day": "2026-12-02", "text": "Garden door (if still open)", "order": 10}, {"id": "1202-2", "day": "2026-12-02", "text": "Prep the sheet metal indoors", "order": 20}, {"id": "1203-1", "day": "2026-12-03", "text": "Re-lay the mulch", "order": 10}, {"id": "1203-2", "day": "2026-12-03", "text": "Attach sheet metal if daylight allows", "order": 20}, {"id": "1205-1", "day": "2026-12-05", "text": "Dump run in the morning", "order": 10}, {"id": "1205-2", "day": "2026-12-05", "text": "Finish the slide", "order": 20}, {"id": "1206-1", "day": "2026-12-06", "text": "Set up tables on the back", "order": 10}, {"id": "1206-2", "day": "2026-12-06", "text": "Final touches", "order": 20}];
+const KEY="house-slide-plan-v1";
+let st={done:{},added:[],removed:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s==="object")st=Object.assign(st,s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){setStatus("This browser isn't saving changes, so they'll be lost when you close the page.")}}
+function refresh(){tasks=SEED.concat(st.added).filter(t=>!st.removed[t.id]).map(t=>Object.assign({},t,{done:!!st.done[t.id]}));loaded=true;draw()}
+function addTask(day,text){st.added.push({id:"a"+Date.now(),day,text,order:Date.now()});save();refresh()}
+function setDone(id,v){if(v)st.done[id]=true;else delete st.done[id];save();refresh()}
+function removeTask(id){st.removed[id]=true;st.added=st.added.filter(t=>t.id!==id);save();refresh()}
+build();refresh();
+</script>
+
+</body>
+</html>
